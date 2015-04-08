@@ -1,0 +1,124 @@
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+body {
+  background: #c0c0c0;
+}
+body, select, input, button {
+  font-family: monospace;
+  font-size: 11px;
+}
+span {
+  color: #fff;
+  background: #999;
+  padding: 5px;
+  border-radius: 5px;
+}
+section,
+aside,
+img {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: auto;
+  height: auto;
+}
+#menuChanges {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 280px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+#menuChanges > button {
+  width: 50px;
+  -webkit-box-flex: 1 auto;
+  -webkit-flex: 1 auto;
+      -ms-flex: 1 auto;
+          flex: 1 auto;
+}
+#btnExport {
+  left: 140px;
+}
+#btnAdd {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 280px;
+  height: 20px;
+}
+section {
+  top: 40px;
+  left: 280px;
+  background: #fff url(./carreaux.png);
+  border-top: 1px solid #808080;
+  border-left: 1px solid #808080;
+  overflow: hidden;
+  text-align: center;
+}
+aside {
+  top: 60px;
+  bottom: 20px;
+  width: 280px;
+  background: #c0c0c0;
+  padding: 2px;
+  overflow: auto;
+}
+aside > div {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: baseline;
+  -webkit-align-items: baseline;
+      -ms-flex-align: baseline;
+          align-items: baseline;
+  background: #999;
+  padding: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  border: 1px solid #808080;
+}
+aside > div > input:not([type="checkbox"]) {
+  width: 50px;
+  -webkit-box-flex: 1 auto;
+  -webkit-flex: 1 auto;
+      -ms-flex: 1 auto;
+          flex: 1 auto;
+}
+aside > div > label {
+  padding-right: 5px;
+  margin-left: 5px;
+}
+aside > div > input[type="checkbox"] {
+  padding: 0;
+  margin: 0;
+  margin-left: 3px;
+  position: relative;
+  top: 3px;
+}
+img {
+  max-height: 100%;
+  max-width: 100%;
+  margin: auto;
+  box-shadow:
+    0 0 0 1px rgba(70,70,70,.1),
+    0 0 10px 1px rgba(70,70,70,.5),
+    0 0 0 3000px rgba(70,70,70,.5)
+  ;
+}
+
+#errorOutput {
+  background: #aa0055;
+  position: relative;
+  top: 50px;
+  z-index: 1;
+}
+#errorOutput:empty {
+  display:none;
+}

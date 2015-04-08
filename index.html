@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>glitch.js</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <header>
+    Drag Image <span>OR</span>
+    Load an Example :
+    <select id="selectExample">
+      <option value="./img/real-girl-windowlicker.jpg">jpg</option>
+      <option value="./img/circlelove.gif">gif</option>
+      <option value="./img/tatung-einstein-computer.png">png</option>
+    </select>
+    <span>OR</span>
+    <input type="file" id="chooseFile">
+  </header>
+  <button id="btnAdd">+++ add change +++</button>
+  <aside id="listOfChanges"></aside>
+  <div id="menuChanges">
+    <button id="btnNew">new</button>
+    <button id="btnImport">import</button>
+    <button id="btnExport">export</button>
+  </div>
+  <section>
+    <img id="imgDisplay"/>
+    <span id="errorOutput"></span>
+  </section>
+
+  <!-- le ECMAScript 6 today -->
+  <script src="./polyfill/promise.js"></script>
+  <script src="./polyfill/fetch.js"></script>
+
+  <!-- le glitch -->
+  <script src="./glitch.js"></script>
+
+  <script>
+
+  var
+     imgDisplay = document.getElementById("imgDisplay")
+    ,errorOutput = document.getElementById("errorOutput")
+    ,selectExample = document.getElementById("selectExample")
+    ,chooseFile = document.getElementById("chooseFile")
+    ,btnNew = document.getElementById("btnNew")
+    ,btnImport = document.getElementById("btnImport")
+    ,btnExport = document.getElementById("btnExport")
+    ,btnAdd = document.getElementById("btnAdd")
+    ,listOfChanges = document.getElementById("listOfChanges")
+  ;
+
+  // ANIBYTE!!!!
+  /////////////////////////////////////////////////////////////////////////////
+  var aniByteLooper;
+  var aniByteSpeed = 41.66; // = 24fps <- eventually let user set it?!
+
+  // Get Image
+  /////////////////////////////////////////////////////////////////////////////
+  var imageURL;
+  function getImage(url) {
+    imageURL = url || imageURL;
+    $glitch(imageURL, mimetype)
+      .then(function(inst) {
+        return inst.change(getChanges())
+      })
+      .then(function(inst) {
+        imgDisplay.src = inst.url;
+        errorOutput.textContent = '';
+      })
+      .catch(function(error) {
+        errorOutput.textContent = error.message;
+      })
+    ;
+  }
+
+
+  // Get Changes
+  /////////////////////////////////////////////////////////////////////////////
+  function getChanges() {
+    var inputs = document.querySelectorAll('aside > div > input');
+    var out = {};
+    var aniByteSome = false;
+    for (var i = 0, l = inputs.length; i < l; i += 4) {
+      if (inputs[i].checked) {
+        if (inputs[i+3].checked) {
+          aniByteSome = true;
+          inputs[i+2].value++;
+          if(inputs[i+2].value > 255){
+            inputs[i+2].value = 0;
+          }
+          out[inputs[i+1].value] = inputs[i+2].value;
+        } else {
+          clearInterval(aniByteLooper);
+          out[inputs[i+1].value] = inputs[i+2].value;
+        }
+      }
+    }
+    if(aniByteSome){
+      clearTimeout(aniByteLooper);
+      aniByteLooper = window.setTimeout(getImage,aniByteSpeed);
+    }
+    return out;
+  }
+
+
+  // Add a change box
+  /////////////////////////////////////////////////////////////////////////////
+  function addChange(o, v) {
+    var
+       blocChange = document.createElement('div')
+      ,checkbox = document.createElement('input')
+      ,checkAni = document.createElement('input')
+      ,labelOff = document.createElement('label')
+      ,inputOff = document.createElement('input')
+      ,labelVal = document.createElement('label')
+      ,inputVal = document.createElement('input')
+      ,btnSuppr = document.createElement('button')
+    ;
+    checkbox.type = 'checkbox';
+    checkbox.checked = true;
+    checkbox.title = 'Show change';
+    checkAni.type = 'checkbox';
+    checkAni.checked = false;
+    checkAni.title = 'Animate value';
+    inputOff.type = 'number';
+    inputVal.type = 'number';
+    inputOff.value = o || 0;
+    inputVal.value = v || 0;
+    inputOff.min = 0;
+    inputVal.min = 0;
+    inputVal.max = 255;
+    labelOff.innerHTML = 'Offset';
+    labelVal.innerHTML = 'Value';
+    btnSuppr.innerHTML = '&times;';
+    blocChange.appendChild(checkbox);
+    blocChange.appendChild(labelOff);
+    blocChange.appendChild(inputOff);
+    blocChange.appendChild(labelVal);
+    blocChange.appendChild(inputVal);
+    blocChange.appendChild(checkAni);
+    blocChange.appendChild(btnSuppr);
+    listOfChanges.appendChild(blocChange);
+    checkbox.onchange = function() {getImage()};
+    checkAni.onchange = function() {getImage()};
+    inputOff.oninput = function() {getImage()};
+    inputVal.oninput = function() {getImage()};
+    btnSuppr.onclick = function() {
+      listOfChanges.removeChild(blocChange);
+      getImage();
+    };
+    getImage();
+  }
+
+  // UI
+  /////////////////////////////////////////////////////////////////////////////
+  selectExample.addEventListener('change', function() {
+    getImage(this.value)
+  }, false);
+
+  btnAdd.addEventListener('click', function() {
+    addChange();
+  }, false);
+
+  btnNew.addEventListener('click', function() {
+    listOfChanges.innerHTML = '';
+  }, false);
+
+  btnImport.addEventListener('click', function() {
+    var imported = prompt('Paste a JSON string with offsets and values');
+    try {
+      var obj = JSON.parse(imported);
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          addChange(key, obj[key]);
+        }
+      }
+    } catch(e) {}
+  }, false);
+
+  btnExport.addEventListener('click', function() {
+    prompt('Copy this JSON string to save your settings', JSON.stringify(getChanges()))
+  }, false);
+
+
+  // Image import
+  /////////////////////////////////////////////////////////////////////////////
+  var reader = new FileReader();
+  reader.addEventListener("loadend", function(e) {
+    getImage(reader.result, mimetype);
+  });
+
+  var mimetype = 'image/jpg';
+  function dragNoDefaulft(e) {e.preventDefault(); return false};
+  document.addEventListener("dragenter", dragNoDefaulft, false);
+  document.addEventListener("dragover", dragNoDefaulft, false);
+  document.addEventListener("dragleave", dragNoDefaulft, false);
+  document.addEventListener("drop", function(e) {
+    e.preventDefault();
+    if (e.dataTransfer.files[0]) {
+      var file = e.dataTransfer.files[0];
+      mimetype = file.type;
+      reader.readAsArrayBuffer(f);
+    };
+    return false;
+  }, false);
+
+  chooseFile.addEventListener("change", function(e) {
+    if (this.files[0]) {
+      var file = this.files[0];
+      mimetype = file.type;
+      reader.readAsArrayBuffer(file);
+    };
+  });
+
+
+  // init
+  /////////////////////////////////////////////////////////////////////////////
+  getImage('./img/real-girl-windowlicker.jpg');
+  // {"62":"0","70":"18"}
+
+  </script>
+</body>
+</html>

@@ -70,6 +70,7 @@
         errorOutput.textContent = '';
       })
       .catch(function(error) {
+        console.error(error.stack)
         errorOutput.textContent = error.message;
       })
     ;
@@ -188,7 +189,7 @@
   /////////////////////////////////////////////////////////////////////////////
   var reader = new FileReader();
   reader.addEventListener("loadend", function(e) {
-    getImage(reader.result, mimetype);
+    getImage(reader.result);
   });
 
   var mimetype = 'image/jpg';

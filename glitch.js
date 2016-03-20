@@ -7,7 +7,7 @@
 
     var
        img = new Image()
-      ,mimetype = type
+      ,mimetype // = type
       ,blob
       ,blobUrl
       ,originalBuffer
@@ -72,7 +72,8 @@
               : Promise.reject(new Error(response.statusText))
           })
           .then(function(response) {
-            mimetype = response.headers.map['content-type'][0];
+            // console.log(response.headers)
+            mimetype = response.headers.get('content-type')
             return response.arrayBuffer();
           })
           .then(function(b) {
